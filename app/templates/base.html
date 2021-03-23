@@ -1,0 +1,30 @@
+<html>
+<head>
+<meta charset="ISO-8859-1">
+{% if title %}
+	<title>{{ title }}</title>
+	{% else %}
+	<title>Covid Map</title>
+{% endif %}
+{%block head %}{% endblock %}  
+</head>
+<body>
+<p>
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<ul>
+{% for message in messages %}
+	<li>{{ message }}</li>
+{% endfor %}
+</ul>
+{% endif %}
+{% endwith %}
+</p>        
+        
+        {%block content %}{% endblock %} 
+        
+
+         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        {%block scripts %}{% endblock %}
+    </body>
+</html>

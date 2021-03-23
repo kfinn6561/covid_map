@@ -1,0 +1,46 @@
+html, body, svg {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+.dialog{
+	display: none;
+	position:fixed;
+	top:10%;
+	left: 25%;
+	width:50%;
+	height:80%;
+	background-color:white;
+	z-index:100;
+	text-align:left;
+	opacity:1.0;
+	border: 2px solid black;
+	overflow:auto;
+	vertical-align:top;
+}
+
+.row { overflow: hidden; position: absolute; }
+.row { left: 0; right: 0; }
+
+.header.row { height: 35px; top: 0 }
+.body.row { top: 35px; bottom: 20px }
+.footer.row { height: 20px; bottom: 0 ;overflow: auto}
+
+
+.country_name_container{
+	top:0px;
+	position:absolute;
+	display:flex;
+	justify-content:center;
+	align-items:center;
+	left:116px;
+	right:4px;
+}
+
+.country_name{
+	display:flex;
+	text-align:center;
+	z-index:30;
+	font-size:30px;
+}

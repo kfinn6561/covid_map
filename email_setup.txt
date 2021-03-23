@@ -1,0 +1,13 @@
+set MAIL_SERVER=smtp.googlemail.com
+set MAIL_PORT=587
+set MAIL_USE_TLS=1
+set MAIL_USERNAME=kieran.errors
+set MAIL_PASSWORD=*********
+
+
+
+export MAIL_SERVER=smtp.googlemail.com
+export MAIL_PORT=587
+export MAIL_USE_TLS=1
+export MAIL_USERNAME=kieran.errors
+export MAIL_PASSWORD=*********

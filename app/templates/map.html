@@ -1,0 +1,144 @@
+{%extends "base.html"%}
+
+
+  {%block head%}
+<link rel="stylesheet" href="{{url_for('static',filename='css/map.css')}}?version=1" type="text/css">
+{%endblock%}
+
+ {%block content%}
+ <div class="header row" >
+ <div style="width:100%;height:30px">
+<h1 style="display:inline">Where Can You Currently Travel{%if vaccinated%} if you're vaccinated{%endif%}? </h1>
+
+
+
+<span style="float:right;display:flex;flex-wrap:nowrap">
+<button id="about_button"><a href="#">About</a></button>
+<button>
+{%if vaccinated%}
+<a href="{{url_for('index',exempt_only=exempt_only,vaccinated=False,colourblind=cblind)}}">I'm not vaccinated</a>
+{%else%}
+<a href="{{url_for('index',exempt_only=exempt_only,vaccinated=True,colourblind=cblind)}}">I'm vaccinated</a>
+{%endif%}
+</button>
+<button>
+{%if exempt_only%}
+<a href="{{url_for('index',exempt_only=False,vaccinated=vaccinated,colourblind=cblind)}}">Show all countries</a>
+{%else%}
+<a href="{{url_for('index',exempt_only=True,vaccinated=vaccinated,colourblind=cblind)}}">Show travel corridors</a>
+{%endif%}
+</button>
+<button>
+{%if cblind%}
+<a href="{{url_for('index',exempt_only=exempt_only,vaccinated=vaccinated,colourblind=False)}}">Normal version</a>
+{%else%}
+<a href="{{url_for('index',exempt_only=exempt_only,vaccinated=vaccinated,colourblind=True)}}">Colourblind friendly</a>
+{%endif%}
+</button>
+</span>
+</div>
+
+
+</div>
+
+
+<div class="body row" style="width:100%;display:flex">
+
+
+<div style="width:112px;border:1px black solid">
+<div style="position:absolute;top:0;height:20px;margin:auto">Least Restrictive</div>
+<div style="position:absolute;top:20px;bottom:20px">
+{%for i in range(1,11)%}
+<div id="key_{{i}}" style="height:10%;width:100%;text-align:center;display:flex;align-items:center"><div style="width:88px;height:100%;float:left;background-color:{{colour_dict[i]}}"></div><span style="position:absolute;left:93px;text-align:center;vertical-align:middle;z-index:-1">{{i}}</span></div>
+{%endfor%}
+</div>
+<div style="position:absolute;height:20px;bottom:0;margin:auto">Most Restrictive</div>
+</div>
+
+<div style="width:auto;text-align:center;flex-grow:100">
+<div class='country_name_container'>
+<div id='country_name' class='country_name' style="	color:{%if cblind%}#00ddff{%else%}black{%endif%}"></div>
+</div>
+{{svg}}
+</div>
+</div>
+
+
+
+<div class="footer row">
+&#169 <a href="mailto:kieran.finn@hotmail.com?subject=Query%20about%20covid%20map">Kieran Finn</a> {{year}}.
+All data is taken from the official UK Government's <a href="https://www.gov.uk/foreign-travel-advice">foreign travel advice</a>.
+Colour coding is my own personal interpretation of this information and is meant as a guide only.
+</div>
+
+
+
+
+<div id="popup" title="Summary" class="dialog">
+<h1 id='popup_top_bar' style="position:sticky;top:0;background-color:white"><span id='popup_bar_country_name'></span><button style="float:right;background-color:red" id="close_popup_button">X</button></h1>
+<h1>Summary of the <a id='popup_fco_link' target="_blank">FCO travel advice</a> for <span id='popup_country_name'></span></h1>
+<div id="popup_summary"></div>
+ </div>
+
+ <div id="about_popup" class=dialog>
+<h1 style="position:sticky;top:0;background-color:white">About this site<button style="float:right;background-color:red" id="close_about_button">X</button></h1>
+<div>
+
+<p style="background-color: #FFFF00">
+    The UK Government has issued another national lockdown. Please do not travel during this time regardless of the status shown on this map.
+</p>
+
+
+<p>
+This map provides a visual guide to the border restrictions in response to the coronavirus pandemic.
+Each country has been assigned a number from 1 to 10 indicating the severity of the new entry restrictions.
+Note that this number refers to new restrictions due to coronavirus <strong>only</strong> and does not take into account existing restrictions.
+The number also represents only the restrictions in place for entering the country and does not take into account possible restrictions on return to the UK.
+</p>
+<p>
+As there is a wide range of restrictions, the rating is somewhat subjective, however the following descriptions should provide a guide to what the numbers mean.
+<ol>
+<li>No restrictions</li>
+<li>No restrictions or simple temperature check if travelling from the UK, but may be restrictions if travelling from other countries.</li>
+<li>Must supply a negative Covid test or take one on arrival.</li>
+<li>Must take two tests and potentially undergo a short (less than 5 days) quarantine.</li>
+<li>Must quarantine on arrival for up to 14 days.</li>
+<li>Must quarantine on arrival for more than 14 days or with other restrictions</li>
+<li>Difficult to get into the country from the UK, but may be possible from another country</li>
+<li>All but impossible to get into the country from the UK. May be possible from other countries but very difficult.</li>
+<li>All but impossible to get into the country unless you are a resident. Possible exemptions for essential workers/students etc</li>
+<li>All but impossible to get into the country unless you are a resident.</li>
+</ol>
+</p>
+
+<p>
+Please refer to the official UK Government's <a href="https://www.gov.uk/foreign-travel-advice">foreign travel advice</a> before planning a trip for up to date information.
+</p>
+
+</div>
+ </div>
+
+{%endblock%}
+
+
+{% block scripts %}
+<script type="text/javascript" src="{{url_for('static',filename='javascript/map.js')}}?version=1.1"></script>
+
+<script>
+const get_summary_url="{{url_for('get_summary')}}";
+
+{%for i in range(1,11)%}
+document.getElementById("key_{{i}}").addEventListener("mouseenter",function(){
+	document.getElementById("country_name").style.backgroundColor="{{colour_dict[i]}}";
+	document.getElementById("country_name").innerHTML="{{i}}: {{description_dict[i]}}"
+})
+{%endfor%}
+
+
+{% for country in countries %}
+new Country("{{country["name"]}}","{{country["code"]}}",{{country["border_status"]}},"{{country["status_colour"]}}",{{country["id"]}},"{{country["url"]}}");
+{% endfor %}
+</script>
+
+
+{%endblock%}
